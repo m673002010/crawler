@@ -4,6 +4,7 @@ import (
 	"crawler/myParser"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 )
 
@@ -33,4 +34,33 @@ func Test_parseMovie() {
 	}
 
 	myParser.ParseMovie(body)
+}
+
+func Test_func() {
+	in := make(chan int)
+	out := make(chan int)
+
+	go func() {
+		for {
+			num := <-in
+			log.Println("go", num)
+			out <- num
+		}
+	}()
+
+	in <- -1
+
+	arr := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+
+	for {
+		res := <-out
+		log.Println("res", res)
+
+		for _, num := range arr {
+			go func(num int) {
+				in <- num
+			}(num)
+		}
+	}
+
 }

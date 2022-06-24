@@ -1,14 +1,13 @@
 package myParser
 
 import (
-	"crawler/engine"
 	"crawler/model"
 	"log"
 	"regexp"
 	"strconv"
 )
 
-func ParseTop250(contents []byte) engine.ParserResult {
+func ParseTop250(contents []byte) model.ParserResult {
 	htmlStr := string(contents)
 
 	// 获取电影id
@@ -19,7 +18,7 @@ func ParseTop250(contents []byte) engine.ParserResult {
 	titleReg := regexp.MustCompile(`<img width="100" alt="(.*?)" src`)
 	titles := titleReg.FindAllStringSubmatch(htmlStr, -1)
 
-	result := engine.ParserResult{}
+	result := model.ParserResult{}
 
 	// 电影名、电影详情url、解析函数ParserFunc
 	for _, title := range titles {
@@ -28,7 +27,7 @@ func ParseTop250(contents []byte) engine.ParserResult {
 
 	for _, id := range movieIds {
 		reqUrl := "https://movie.douban.com/subject/" + id[1]
-		result.Requests = append(result.Requests, engine.Request{
+		result.Requests = append(result.Requests, model.Request{
 			Url:        reqUrl,
 			ParserFunc: ParseMovie,
 		})
@@ -37,7 +36,7 @@ func ParseTop250(contents []byte) engine.ParserResult {
 	return result
 }
 
-func ParseMovie(contents []byte) engine.ParserResult {
+func ParseMovie(contents []byte) model.ParserResult {
 	htmlStr := string(contents)
 
 	movie := model.Movie{}
@@ -84,10 +83,8 @@ func ParseMovie(contents []byte) engine.ParserResult {
 	imageReg := regexp.MustCompile(`<meta property="og:image" content="(.*?)" />`)
 	movie.Image = imageReg.FindAllStringSubmatch(htmlStr, -1)[0][1]
 
-	log.Println(movie)
-
 	// 返回电影详情信息
-	result := engine.ParserResult{
+	result := model.ParserResult{
 		Items: []interface{}{movie},
 	}
 
